@@ -19,8 +19,8 @@ public class UserDTO {
 	private String street;
 	private String pincode;
 	private String role;
-	private String  createdon;
-	private String  updatedon;
+	private String createdon;
+	private String updatedon;
 
 	public UserDTO() {
 	

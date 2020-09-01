@@ -12,6 +12,13 @@
 	</properties>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.ezshare.backend</groupId>
   			<artifactId>JavaBackend</artifactId>
@@ -34,5 +41,12 @@
 			<artifactId>postgresql</artifactId>
 			<version>42.2.14</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+		
 	</dependencies>
 </project>

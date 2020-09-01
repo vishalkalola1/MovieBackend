@@ -64,8 +64,8 @@ public abstract class GenericDAO<T, I> {
 		return em.createQuery(query,getEntityClass()).getResultList();
 	}
 	
-	public List<T> getByOtherColumnId(I id, String columnName) {
-		String query = "from " + getClassName() + " where " + columnName + " = " + id;
+	public List<T> getByOtherColumnId(Long long1, String columnName) {
+		String query = "from " + getClassName() + " where " + columnName + " = '" + long1 + "'";
 		return em.createQuery(query,getEntityClass()).getResultList();
 	}
 	
