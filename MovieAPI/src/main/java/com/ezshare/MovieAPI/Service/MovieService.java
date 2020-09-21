@@ -2,14 +2,13 @@ package com.ezshare.MovieAPI.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.Column;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -17,12 +16,8 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ezshare.MovieAPI.DTO.MovieDTO;
-import com.ezshare.MovieAPI.DTO.UserDTO;
 import com.ezshare.Questionnaire.services.MovieDAO;
-import com.ezshare.datamodel.AddressModel;
-import com.ezshare.datamodel.ContactModel;
 import com.ezshare.datamodel.MovieModel;
-import com.ezshare.datamodel.UserModel;
 
 @Path("/MovieService")
 public class MovieService {
@@ -38,7 +33,6 @@ public class MovieService {
 		
 		Date dNow = new Date( );
 	    SimpleDateFormat ft = new SimpleDateFormat ("dd/mm/yyyy HH:mm:ss");
-		System.out.println(ft.format(dNow));
 		movieDTO.setCreatedon(ft.format(dNow));
 		movieDTO.setUpdatedon(ft.format(dNow));
 		
@@ -46,7 +40,7 @@ public class MovieService {
 		model.setId(model.getId());
 		model.setTitle(movieDTO.getTitle());
 		model.setDetails(movieDTO.getDetails());
-		model.setImageLink(movieDTO.getCreatedon());
+		model.setImageLink(movieDTO.getImageLink());
 		model.setReleaseDate(movieDTO.getReleaseDate());
 		model.setCategory(movieDTO.getCategory());
 		model.setMovieDirector(movieDTO.getMovieDirector());
@@ -68,4 +62,19 @@ public class MovieService {
 		return Response.ok().entity(dto.listAll()).build();
 	}
 	
+	@GET
+	@Path("/searchMovie")
+	@Produces(value = MediaType.APPLICATION_JSON)
+	public Response search(@QueryParam("name") String name) {
+		MovieDTO dto = new MovieDTO();
+		return Response.ok().entity(dto.getSearch(name)).build();
+	}
+	
+	@GET
+	@Path("/details")
+	@Produces(value = MediaType.APPLICATION_JSON)
+	public Response details(@QueryParam("id") long id) {
+		MovieDTO dto = new MovieDTO();
+		return Response.ok().entity(dto.getDetails(id)).build();
+	}
 }

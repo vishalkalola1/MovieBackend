@@ -34,6 +34,8 @@ public class MovieDTO {
 	private String category;
 	private String movieDirector;
 	
+	
+	
 	public MovieDTO(Long id, String title, String details, String imageLink, String createdon, String updatedon,
 			String releaseDate, String category, String movieDirector) {
 		this.id = id;
@@ -151,6 +153,66 @@ public class MovieDTO {
 		}
 		return movies;
 	}
+	
+	public List<MovieModel> getSearch(String name){
+		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
+				AuthTokens.basic("neo4j", "root"));
+		Session session = driver.session();
+		Transaction tx = session.beginTransaction();
+		List<MovieModel> movies = new ArrayList<MovieModel>();
+
+		//Result result = tx.run("MATCH (n {name: $varName }) RETURN n", parameters("varName", name));
+		Result result = tx.run("MATCH (n:MovieModel) where n.title STARTS WITH \"" + name + "\" RETURN n");
+		while (result.hasNext()) {
+			Record row = result.next();
+			Value value = row.get("n");
+			Node node = value.asNode();
+			Map<String, Object> properties = value.asEntity().asMap();
+			MovieModel movie = new MovieModel();
+			movie.setId(node.id());
+			movie.setTitle(String.valueOf(properties.get("title")));
+			movie.setDetails(String.valueOf(properties.get("details")));
+			movie.setImageLink(String.valueOf(properties.get("imageLink")));
+			movie.setReleaseDate(String.valueOf(properties.get("releaseDate")));
+			movie.setCategory(String.valueOf(properties.get("category")));
+			movie.setMovieDirector(String.valueOf(properties.get("movieDirector")));
+			movie.setCreatedon(String.valueOf(properties.get("createdon")));
+			movie.setUpdatedon(String.valueOf(properties.get("updatedon")));
+			movies.add(movie);
+		}
+		return movies;
+	}
+	
+	public MovieModel getDetails(long id){
+		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
+				AuthTokens.basic("neo4j", "root"));
+		Session session = driver.session();
+		Transaction tx = session.beginTransaction();
+		List<MovieModel> movies = new ArrayList<MovieModel>();
+
+		//Result result = tx.run("MATCH (n {name: $varName }) RETURN n", parameters("varName", name));
+		Result result = tx.run("MATCH (n) WHERE ID(n) = " + id + " RETURN n");
+		while (result.hasNext()) {
+			Record row = result.next();
+			Value value = row.get("n");
+			Node node = value.asNode();
+			Map<String, Object> properties = value.asEntity().asMap();
+			MovieModel movie = new MovieModel();
+			movie.setId(node.id());
+			movie.setTitle(String.valueOf(properties.get("title")));
+			movie.setDetails(String.valueOf(properties.get("details")));
+			movie.setImageLink(String.valueOf(properties.get("imageLink")));
+			movie.setReleaseDate(String.valueOf(properties.get("releaseDate")));
+			movie.setCategory(String.valueOf(properties.get("category")));
+			movie.setMovieDirector(String.valueOf(properties.get("movieDirector")));
+			movie.setCreatedon(String.valueOf(properties.get("createdon")));
+			movie.setUpdatedon(String.valueOf(properties.get("updatedon")));
+			movies.add(movie);
+		}
+		return movies.get(0);
+	}
+	
+	
 
 	public MovieModel createMovies(final MovieModel movie) {
 		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
@@ -188,9 +250,7 @@ public class MovieDTO {
 				tx.commit();
 				return movie;
 			}
-
 		});
 		return res;
 	}
-
 }

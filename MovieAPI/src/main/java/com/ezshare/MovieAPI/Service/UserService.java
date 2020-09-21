@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -44,46 +45,51 @@ public class UserService {
 	@Inject
 	ContactDAO contactDAO;
 	
-//	@GET
-//	@Path("/getuser")
-//	@Produces(value = MediaType.APPLICATION_JSON)
-//	public Response getuser() throws IOException {
-////		java.util.List<User> users = userDAO.getAll();
-////		return Response.ok().entity(users).build();
-//
-//		 URL url = new URL("http://localhost:8080/auth/realms/test-oidc/protocol/openid-connect/token");
-//	        Map<String,Object> params = new LinkedHashMap<>();
-//	        params.put("client_id", "test-application");
-//	        params.put("grant_type", "password");
-//	        params.put("username", "test");
-//	        params.put("password", "test");
-//
-//	        StringBuilder postData = new StringBuilder();
-//	        for (Map.Entry<String,Object> param : params.entrySet()) {
-//	            if (postData.length() != 0) postData.append('&');
-//	            postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-//	            postData.append('=');
-//	            postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-//	        }
-//	        byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-//
-//	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-//	        conn.setRequestMethod("POST");
-//	        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getJson() {
+	    Map<String, String> testMap = new HashMap<>();
+	    testMap.put("username", "vishal1");
+	    testMap.put("password", "123");
+
+	    return Response.status(200).entity(testMap).build();
+	}
+	
+	@GET
+	@Path("/getuser")
+	@Produces(value = MediaType.APPLICATION_JSON)
+	public Response getuser() throws IOException {
+//		java.util.List<User> users = userDAO.getAll();
+//		return Response.ok().entity(users).build();
+
+		 URL url = new URL("http://localhost:8080/apiman-gateway/ezshare/authenticateUser/1.0?apikey=0429b102-d063-4094-bcf7-5bf0149d5974");
+	        
+
+		 String jsonInputString = "{\"username\": \"vishal1\", \"password\": \"123\"}";
+
+		 
+
+	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	        conn.setRequestMethod("POST");
+	        conn.setRequestProperty("Content-Type", "application/json");
+	        conn.setRequestProperty("Authorization", "bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJxSXVnV1owWXJWQlhPVTN1bm9pRV9iT2g4ZkpscDE2ZzExZ01xN1ZIem1rIn0.eyJqdGkiOiJiMWE2YWI1OS04MjdjLTQ0MjItOGY3Yi1lZWQzMzE4NTYzNWEiLCJleHAiOjE1OTkzNDA5NzAsIm5iZiI6MCwiaWF0IjoxNTk5MzQwNjcwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvdGVzdC1vaWRjIiwiYXVkIjoidGVzdC1hcHBsaWNhdGlvbiIsInN1YiI6ImFiNjU3YzI2LTMwZDEtNDgyYi1hMDI2LTk2MmQ2YzdkYzZjYiIsInR5cCI6IkJlYXJlciIsImF6cCI6InRlc3QtYXBwbGljYXRpb24iLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiJiMmVmNTc1NS1hMjkwLTRjYWQtODNhYi05NTY3YWY4OTNiN2UiLCJhY3IiOiIxIiwiY2xpZW50X3Nlc3Npb24iOiI0Y2FlNzI0Mi1kMTY2LTRmNWItOWVhYy1jNDM4YjllZDE3NDEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiIsImh0dHA6Ly9sb2NhbGhvc3Q6MzAwMS8qIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJ2aWV3LXByb2ZpbGUiXX19LCJuYW1lIjoidGVzdCIsInByZWZlcnJlZF91c2VybmFtZSI6InRlc3QiLCJmYW1pbHlfbmFtZSI6InRlc3QifQ.cEJiYpPUu6o5Y_l4M_HBlnGM1oLCP0ZZrtldWefuIWU7Ams9NpEnrp8eC2f2H29Q73-4lqC4BwmJzNUFe_85jxOUoFG_Iv7ThqC6arGU6O6m5mpTXqH9PcvjQKFqkZ841x3OyqoZVk_tUu2ig6DcPcAEopZrOfcE1oaI9yEwONJaH0a7jxh8DyycL4RlDMAotoYvugIVgBdRPEZ2CJKbXbhnf37uFLJVsvIrZqlElnrMZDLEzKL8U4ZIMD0RXJcUOT0CbHDLxrsnmHafIeVeavV4Ne_WQYeJ4u6XB9WyjziDFUFmzwReDUDN85XoKncZ56A4o2mq7HpJKoRZNfnULw");
 //	        conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
-//	        conn.setDoOutput(true);
-//	        conn.getOutputStream().write(postDataBytes);
-//
-//	        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//
-//	        StringBuilder sb = new StringBuilder();
-//	        for (int c; (c = in.read()) >= 0;)
-//	            sb.append((char)c);
-//	        String response = sb.toString();
-//	        System.out.println(response);
-//		return Response.serverError().build();
-//		
-//	}
+	        conn.setDoOutput(true);
+
+	        try(OutputStream os = conn.getOutputStream()) {
+			    byte[] input = jsonInputString.getBytes("utf-8");
+			    os.write(input, 0, input.length);			
+			}
+	        
+	        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+	        StringBuilder sb = new StringBuilder();
+	        for (int c; (c = in.read()) >= 0;)
+	            sb.append((char)c);
+	        String response = sb.toString();
+	        System.out.println(response);
+	        return Response.status(200).entity(response).build();
+	}
 	
 	@POST
 	@Path("/createUser")
@@ -138,7 +144,9 @@ public class UserService {
 				
 				return Response.status(Status.OK).entity(user).build();
 			} catch (Exception e) {
-				return Response.serverError().build();
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("error", "username is already exist.");
+				return Response.status(Status.NOT_ACCEPTABLE).entity(map).build();
 			}
 		} else {
 			Map<String, String> map = new HashMap<String, String>();
@@ -185,7 +193,9 @@ public class UserService {
 				return Response.status(Status.UNAUTHORIZED).entity(map).build();
 			}
 		} else {
-			return Response.serverError().build();
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("error", "Wrong Credentials");
+			return Response.status(Status.UNAUTHORIZED).entity(map).build();
 		}
 	}
 }
