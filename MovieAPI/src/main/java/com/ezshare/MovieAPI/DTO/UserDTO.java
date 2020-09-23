@@ -26,8 +26,6 @@ public class UserDTO {
 	
 	}
 	
-	
-	
 	public UserDTO(Long id, String username, String password, String birthdate, String gender, String email,
 			String country, String area, String city, String street, String pincode, String role, String createdon,
 			String updatedon) {
@@ -43,7 +41,6 @@ public class UserDTO {
 		this.street = street;
 		this.pincode = pincode;
 		this.role = role;
-		
 		Date dNow = new Date( );
 	    SimpleDateFormat ft = new SimpleDateFormat ("dd/mm/yyyy HH:mm:ss");
 		System.out.println(ft.format(dNow));
