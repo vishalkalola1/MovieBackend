@@ -1,9 +1,20 @@
 package com.ezshare.MovieAPI.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -78,5 +89,47 @@ public class MovieService {
 	public Response details(@QueryParam("id") long id) {
 		MovieDTO dto = new MovieDTO();
 		return Response.ok().entity(dto.getDetails(id)).build();
+	}
+	
+	@POST
+	@Path("/getTopMovies")
+	@Produces(value = MediaType.APPLICATION_JSON)
+	public Response homeAPI(@RequestBody Map<String, String> details) {
+		String userid = details.get("userid");
+		System.out.println(Response.created(URI.create("getMovie/?s=" + userid)).build());
+		return null;
+		
+	}
+	
+	
+	@GET
+	@Path("/getMovie")
+	@Produces(value = MediaType.APPLICATION_JSON)
+	public Response getMovieData(@QueryParam("s") String userid) throws IOException {
+		 URL url = new URL("http://localhost:4000/api/tws/getSeenMovie");
+	        
+
+		 String jsonInputString = "{userid\":" + userid +"}";
+
+		 
+
+	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	        conn.setRequestMethod("POST");
+	        conn.setRequestProperty("Content-Type", "application/json");
+	        conn.setDoOutput(true);
+
+	        try(OutputStream os = conn.getOutputStream()) {
+			    byte[] input = jsonInputString.getBytes("utf-8");
+			    os.write(input, 0, input.length);			
+			}
+	        
+	        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+	        StringBuilder sb = new StringBuilder();
+	        for (int c; (c = in.read()) >= 0;)
+	            sb.append((char)c);
+	        String response = sb.toString();
+	        System.out.println(response);
+	        return Response.status(200).entity(response).build();
 	}
 }
