@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -95,41 +97,19 @@ public class MovieService {
 	@Path("/getTopMovies")
 	@Produces(value = MediaType.APPLICATION_JSON)
 	public Response homeAPI(@RequestBody Map<String, String> details) {
-		String userid = details.get("userid");
-		System.out.println(Response.created(URI.create("getMovie/?s=" + userid)).build());
-		return null;
+		MovieDTO dto = new MovieDTO();
 		
-	}
-	
-	
-	@GET
-	@Path("/getMovie")
-	@Produces(value = MediaType.APPLICATION_JSON)
-	public Response getMovieData(@QueryParam("s") String userid) throws IOException {
-		 URL url = new URL("http://localhost:4000/api/tws/getSeenMovie");
-	        
-
-		 String jsonInputString = "{userid\":" + userid +"}";
-
-		 
-
-	        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-	        conn.setRequestMethod("POST");
-	        conn.setRequestProperty("Content-Type", "application/json");
-	        conn.setDoOutput(true);
-
-	        try(OutputStream os = conn.getOutputStream()) {
-			    byte[] input = jsonInputString.getBytes("utf-8");
-			    os.write(input, 0, input.length);			
-			}
-	        
-	        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-
-	        StringBuilder sb = new StringBuilder();
-	        for (int c; (c = in.read()) >= 0;)
-	            sb.append((char)c);
-	        String response = sb.toString();
-	        System.out.println(response);
-	        return Response.status(200).entity(response).build();
+		List<MovieModel> lastSeenMovies = dto.getSeenMovies(details.get("userid"));
+		
+		List<MovieModel> recommondationmovie = dto.getRecommondationMovie();
+		
+		List<MovieModel> newMovie = dto.getLastInsertMovies();
+		
+		Map<String, List<MovieModel>> map = new HashMap<String, List<MovieModel>>();
+		map.put("lastSeenMovies", lastSeenMovies);
+		map.put("recommondationmovie", recommondationmovie);
+		map.put("newMovie", newMovie);
+		
+		return Response.ok().entity(map).build();
 	}
 }

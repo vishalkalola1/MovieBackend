@@ -2,8 +2,10 @@ package com.ezshare.MovieAPI.DTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 
@@ -20,6 +22,19 @@ import org.springframework.stereotype.Repository;
 import org.neo4j.driver.TransactionWork;
 
 import com.ezshare.datamodel.MovieModel;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.util.JSON;
+import static com.mongodb.client.model.Filters.*;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
 
 public class MovieDTO {
 
@@ -157,6 +172,7 @@ public class MovieDTO {
 	public List<MovieModel> getSearch(String name){
 		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
 				AuthTokens.basic("neo4j", "root"));
+					
 		Session session = driver.session();
 		Transaction tx = session.beginTransaction();
 		List<MovieModel> movies = new ArrayList<MovieModel>();
@@ -252,5 +268,127 @@ public class MovieDTO {
 			}
 		});
 		return res;
+	}
+	
+	public List<MovieModel> getMovies(List<String> movieids) {
+		Driver driver = GraphDatabase.driver("bolt://100.25.221.22:41521", 
+				AuthTokens.basic("neo4j", "stop-stomachs-programs"));
+					
+		Session session = driver.session();
+		Transaction tx = session.beginTransaction();
+		List<MovieModel> movies = new ArrayList<MovieModel>();
+        
+        String citiesCommaSeparated = String.join(",", movieids);
+        citiesCommaSeparated = "0,0,0,0,0";
+        String query = "MATCH (u:Movie) WHERE ID(u) IN [" + citiesCommaSeparated + "] RETURN u";
+		
+		Result result = tx.run(query); 
+		while (result.hasNext()) {
+			Record row = result.next();
+			Value value = row.get("u");
+			Node node = value.asNode();
+			Map<String, Object> properties = value.asEntity().asMap();
+			MovieModel movie = new MovieModel();
+			movie.setId(node.id());
+			movie.setTitle(String.valueOf(properties.get("title")));
+			movie.setDetails(String.valueOf(properties.get("details")));
+			movie.setImageLink(String.valueOf(properties.get("imageLink")));
+			movie.setReleaseDate(String.valueOf(properties.get("releaseDate")));
+			movie.setCategory(String.valueOf(properties.get("category")));
+			movie.setMovieDirector(String.valueOf(properties.get("movieDirector")));
+			movie.setCreatedon(String.valueOf(properties.get("createdon")));
+			movie.setUpdatedon(String.valueOf(properties.get("updatedon")));
+			movies.add(movie);
+		}
+		
+		return movies;
+	}
+	
+	public List<MovieModel> getLastInsertMovies() {
+		Driver driver = GraphDatabase.driver("bolt://100.25.221.22:41521", 
+				AuthTokens.basic("neo4j", "stop-stomachs-programs"));
+					
+		Session session = driver.session();
+		Transaction tx = session.beginTransaction();
+		List<MovieModel> movies = new ArrayList<MovieModel>();
+        
+        String query = "Match (n) Return n Order by ID(n) desc Limit 10";
+		
+		Result result = tx.run(query); 
+		while (result.hasNext()) {
+			Record row = result.next();
+			Value value = row.get("n");
+			Node node = value.asNode();
+			Map<String, Object> properties = value.asEntity().asMap();
+			MovieModel movie = new MovieModel();
+			movie.setId(node.id());
+			movie.setTitle(String.valueOf(properties.get("title")));
+			movie.setDetails(String.valueOf(properties.get("details")));
+			movie.setImageLink(String.valueOf(properties.get("imageLink")));
+			movie.setReleaseDate(String.valueOf(properties.get("releaseDate")));
+			movie.setCategory(String.valueOf(properties.get("category")));
+			movie.setMovieDirector(String.valueOf(properties.get("movieDirector")));
+			movie.setCreatedon(String.valueOf(properties.get("createdon")));
+			movie.setUpdatedon(String.valueOf(properties.get("updatedon")));
+			movies.add(movie);
+		}
+		
+		return movies;
+	}
+	
+	@SuppressWarnings({ "resource", "unchecked" })
+	public List<MovieModel> getSeenMovies(String userid) {
+		try{  
+			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&retryWrites=true&w=majority");
+			MongoClient mongoClient = new MongoClient(clientUrl);
+			MongoDatabase db = mongoClient.getDatabase("project0");  
+			MongoCollection<Document> collection = db.getCollection("ratings");   
+			
+			List<String> movieids = new ArrayList<String>();
+			for (Document document : collection.find(eq("userid", userid))) {
+				Map<String, String> obj= (Map<String, String>) JSON.parse(document.toJson());
+				String movieid = obj.get("movieid");
+				if(!movieids.contains(movieid)) {
+					movieids.add(movieid);
+				}
+			}
+			
+			return getMovies(movieids);
+  
+		}catch(Exception e){  
+				
+			System.out.println(e);  
+			return null;  
+		}
+	}
+	
+	@SuppressWarnings({ "resource", "unchecked" })
+	public List<MovieModel> getRecommondationMovie() {
+		try{  
+			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&retryWrites=true&w=majority");
+			MongoClient mongoClient = new MongoClient(clientUrl);
+			MongoDatabase db = mongoClient.getDatabase("project0");  
+			MongoCollection<Document> collection = db.getCollection("ratings");
+			
+			List<String> movieids = new ArrayList<String>();
+			
+			for (Document document : collection.find()) {
+				Map<String, String> obj= (Map<String, String>) JSON.parse(document.toJson());
+				String rating = obj.get("rating");
+					if(rating.equals("4") || rating.equals("5")) {
+					String movieid = obj.get("movieid");
+					if(!movieids.contains(movieid)) {
+						movieids.add(movieid);
+					}
+				}
+			}
+			
+			return getMovies(movieids);
+  
+		}catch(Exception e){  
+				
+			System.out.println(e);  
+			return null;  
+		}
 	}
 }
