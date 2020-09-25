@@ -271,16 +271,16 @@ public class MovieDTO {
 	}
 	
 	public List<MovieModel> getMovies(List<String> movieids) {
-		Driver driver = GraphDatabase.driver("bolt://100.25.221.22:41521", 
-				AuthTokens.basic("neo4j", "stop-stomachs-programs"));
+		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
+				AuthTokens.basic("neo4j", "root"));
 					
 		Session session = driver.session();
 		Transaction tx = session.beginTransaction();
 		List<MovieModel> movies = new ArrayList<MovieModel>();
         
         String citiesCommaSeparated = String.join(",", movieids);
-        citiesCommaSeparated = "0,0,0,0,0";
-        String query = "MATCH (u:Movie) WHERE ID(u) IN [" + citiesCommaSeparated + "] RETURN u";
+ 
+        String query = "MATCH (u:MovieModel) WHERE ID(u) IN [" + citiesCommaSeparated + "] RETURN u";
 		
 		Result result = tx.run(query); 
 		while (result.hasNext()) {
@@ -305,8 +305,8 @@ public class MovieDTO {
 	}
 	
 	public List<MovieModel> getLastInsertMovies() {
-		Driver driver = GraphDatabase.driver("bolt://100.25.221.22:41521", 
-				AuthTokens.basic("neo4j", "stop-stomachs-programs"));
+		Driver driver = GraphDatabase.driver("bolt://192.168.56.101:10687", 
+				AuthTokens.basic("neo4j", "root"));
 					
 		Session session = driver.session();
 		Transaction tx = session.beginTransaction();
@@ -339,7 +339,7 @@ public class MovieDTO {
 	@SuppressWarnings({ "resource", "unchecked" })
 	public List<MovieModel> getSeenMovies(String userid) {
 		try{  
-			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&retryWrites=true&w=majority");
+			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&w=majority");
 			MongoClient mongoClient = new MongoClient(clientUrl);
 			MongoDatabase db = mongoClient.getDatabase("project0");  
 			MongoCollection<Document> collection = db.getCollection("ratings");   
@@ -365,7 +365,7 @@ public class MovieDTO {
 	@SuppressWarnings({ "resource", "unchecked" })
 	public List<MovieModel> getRecommondationMovie() {
 		try{  
-			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&retryWrites=true&w=majority");
+			MongoClientURI clientUrl = new MongoClientURI("mongodb://root:root@cluster0-shard-00-00.3kixn.mongodb.net:27017,cluster0-shard-00-01.3kixn.mongodb.net:27017,cluster0-shard-00-02.3kixn.mongodb.net:27017/project0?ssl=true&replicaSet=atlas-c3j4kj-shard-0&authSource=admin&w=majority");
 			MongoClient mongoClient = new MongoClient(clientUrl);
 			MongoDatabase db = mongoClient.getDatabase("project0");  
 			MongoCollection<Document> collection = db.getCollection("ratings");
